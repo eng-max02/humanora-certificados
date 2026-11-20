@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Humanora · Atividades e Certificados</title>
+<meta name="description" content="Faça as atividades dos seus e-books Humanora e receba seu certificado de conclusão.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--bg:#f6f4ee;--card:#fff;--ink:#1d2433;--mut:#5b6475;--line:#e5e2d8;--c1:#06465a;--c2:#f59a2c;--ok:#1f9d5b;--bad:#d64545}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:'Poppins',system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.5}
+a{color:var(--c1)}
+header.top{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+header.top .in{max-width:980px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:12px}
+header.top img{height:38px}
+header.top .sp{flex:1}
+header.top a.home{font-size:13px;text-decoration:none;font-weight:600;color:var(--c1)}
+main{max-width:980px;margin:0 auto;padding:20px 16px 60px}
+h1{font-size:26px;line-height:1.2;margin:8px 0 6px;font-weight:800}
+h2{font-size:19px;margin:26px 0 10px;font-weight:700}
+h3{font-size:15px;margin:18px 0 6px;font-weight:700}
+p{margin:6px 0}
+.mut{color:var(--mut);font-size:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:16px;margin-top:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden;display:flex;flex-direction:column}
+.card img.capa{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.card .b{padding:14px 16px 16px;display:flex;flex-direction:column;gap:8px;flex:1}
+.card .t{font-weight:700;font-size:16px}
+.bar{height:8px;background:#ece9df;border-radius:8px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--ok)}
+.btn{display:inline-block;border:0;border-radius:12px;padding:12px 18px;font:600 15px 'Poppins',sans-serif;background:var(--c1);color:#fff;text-decoration:none;cursor:pointer;text-align:center}
+.btn.alt{background:var(--c2);color:#2b1a00}
+.btn.ghost{background:#fff;color:var(--c1);border:1.5px solid var(--c1)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.chip{display:inline-block;font-size:12px;font-weight:600;padding:3px 10px;border-radius:20px;background:#eceff3;color:#44506a}
+.chip.ok{background:#dff3e7;color:#146b3c}.chip.wip{background:#fff1d6;color:#8a5a00}.chip.lock{background:#eee;color:#888}
+.row{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.hero{display:grid;grid-template-columns:200px 1fr;gap:20px;align-items:center}
+.hero img{width:100%;border-radius:16px}
+@media(max-width:620px){.hero{grid-template-columns:1fr}.hero img{max-width:240px}}
+.mod{display:flex;gap:12px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin:8px 0;text-decoration:none;color:inherit}
+.mod .n{width:34px;height:34px;border-radius:50%;background:var(--c1);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;flex:none}
+.mod .tt{flex:1;font-weight:600;font-size:14.5px}
+.box{background:#fff;border:1px solid var(--line);border-radius:16px;padding:16px}
+.sum{background:#eef5f7;border-radius:14px;padding:12px 16px;font-size:14px}
+.q{background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:12px 0}
+.q .qt{font-weight:600;margin-bottom:8px}
+.q label{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:10px;cursor:pointer;border:1.5px solid transparent;font-size:14.5px}
+.q label:hover{background:#f4f6f8}
+.q input{margin-top:5px;accent-color:var(--c1)}
+.q.right label.sel{background:#e3f6ea;border-color:var(--ok)}
+.q.wrong label.sel{background:#fde7e7;border-color:var(--bad)}
+.q.wrong label.corr,.q.right label.corr{background:#e3f6ea;border-color:var(--ok)}
+.fb{font-size:13px;font-weight:600;margin-top:4px}
+textarea,input[type=text]{width:100%;font:15px 'Poppins',sans-serif;padding:12px;border:1.5px solid var(--line);border-radius:12px;background:#fff;color:var(--ink)}
+textarea{min-height:88px;resize:vertical}
+.score{font-size:42px;font-weight:800;line-height:1}
+.result{background:#fff;border:2px solid var(--line);border-radius:18px;padding:18px;margin:16px 0}
+.result.pass{border-color:var(--ok);background:#f1fbf5}.result.fail{border-color:var(--bad);background:#fff6f6}
+.crumb{font-size:13px;margin-bottom:4px}
+.foot{font-size:12px;color:var(--mut);margin-top:30px;border-top:1px solid var(--line);padding-top:14px}
+canvas#cv{width:100%;max-width:720px;border:1px solid var(--line);border-radius:12px;display:block;margin:10px 0}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header class="top"><div class="in">
+<a href="#/"><img src="logo.png" alt="Humanora"></a><span class="sp"></span><span id="sync" style="font-size:11px;color:#1f9d5b"></span><a class="home" href="#/">Meus e-books</a><a class="home" href="#" id="out" style="color:#8a93a6;font-weight:500" onclick="logout();return false">Sair</a>
+</div></header>
+<main id="app"></main>
+<script src="data.js"></script>
+<script src="config.js"></script>
+<script>
+const KEY='humanora_certificados_v2';
+const PASS=0.7;
+let S=load();
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.e?s:{nome:'',cpf:'',e:{}}}catch(e){return {nome:'',cpf:'',e:{}}}}
+let syncT=null;
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}schedSync()}
+function setSync(t,ok){const el=document.getElementById('sync');if(el){el.textContent=t;el.style.color=ok?'#1f9d5b':'#8a5a00'}}
+function schedSync(){if(!API_URL||!S.cpf)return;clearTimeout(syncT);setSync('salvando…',false);syncT=setTimeout(pushState,1200)}
+function slim(){const o=JSON.parse(JSON.stringify(S.e));Object.values(o).forEach(e=>Object.values(e.m||{}).forEach(m=>{m.tc=(m.tc||'').slice(0,700);m.ta=(m.ta||'').slice(0,700)}));return o}
+async function api(body){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});return r.json()}
+async function pushState(){try{const r=await api({action:'save',cpf:S.cpf,nome:S.nome,state:slim()});setSync(r.ok?'salvo ✓':'erro ao salvar',!!r.ok)}catch(e){setSync('sem conexão (salvo neste aparelho)',false)}}
+function normN(s){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim()}
+function cpfOk(c){c=(c||'').replace(/\D/g,'');if(c.length!==11||/^(\d)\1+$/.test(c))return false;for(let t=9;t<11;t++){let s=0;for(let i=0;i<t;i++)s+=(+c[i])*(t+1-i);const d=(s*10)%11%10;if(d!==+c[t])return false}return true}
+function maskCpf(v){v=v.replace(/\D/g,'').slice(0,11);return v.replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d)/,'$1.$2').replace(/(\d{3})(\d{1,2})$/,'$1-$2')}
+function logout(){if(confirm('Sair deste aparelho? Seu progresso continua salvo e volta quando você entrar de novo com seu CPF e nome.')){try{localStorage.removeItem(KEY)}catch(e){}S={nome:'',cpf:'',e:{}};location.hash='#/';route()}}
+function login(){
+  setTheme(null);document.title='Entrar · Humanora';
+  app.innerHTML=`<h1>Bem-vindo(a)!</h1><p class="mut">Para salvar o seu progresso e emitir o seu certificado, identifique-se. Se você já começou antes, entre com o mesmo CPF e nome para continuar de onde parou, mesmo em outro aparelho.</p>
+  <div class="box"><h3>Nome completo</h3><input type="text" id="ln" placeholder="Como no seu documento" autocomplete="name">
+  <h3>CPF</h3><input type="text" id="lc" inputmode="numeric" placeholder="000.000.000-00" autocomplete="off">
+  <label style="display:flex;gap:10px;margin:14px 0;font-size:13px;align-items:flex-start"><input type="checkbox" id="lk" style="margin-top:4px"><span>Autorizo a Humanora Educação em Cursos Livres Ltda a guardar meu nome, CPF e progresso nas atividades, apenas para recuperar meu acesso, validar e emitir meu certificado, conforme a LGPD. Posso pedir a exclusão dos meus dados a qualquer momento.</span></label>
+  <button class="btn" id="lb">Entrar</button><p class="mut" id="le" style="color:var(--bad)"></p></div>`;
+  $('#lc').addEventListener('input',()=>{$('#lc').value=maskCpf($('#lc').value)});
+  $('#lb').onclick=async()=>{
+    const n=$('#ln').value.trim().replace(/\s+/g,' '),c=$('#lc').value.replace(/\D/g,'');const er=$('#le');er.textContent='';
+    if(n.split(' ').length<2){er.textContent='Digite o nome completo.';return}
+    if(!cpfOk(c)){er.textContent='CPF inválido. Confira os números.';return}
+    if(!$('#lk').checked){er.textContent='Marque a autorização para continuar.';return}
+    $('#lb').disabled=true;$('#lb').textContent='Entrando…';
+    try{
+      let st0=null;
+      if(API_URL){const r=await api({action:'get',cpf:c,nome:n});
+        if(!r.ok&&r.err==='nome'){er.textContent='Este CPF já está cadastrado com outro nome. Se foi erro de digitação, fale com a Humanora para corrigir.';$('#lb').disabled=false;$('#lb').textContent='Entrar';return}
+        if(r.ok&&r.state)st0=r.state}
+      S={nome:n,cpf:c,e:st0||S.e||{}};if(!API_URL&&S.cpf!==c){S.e={}}
+      save();location.hash='#/';route();
+    }catch(x){er.textContent='Sem conexão com a internet. Tente de novo.';$('#lb').disabled=false;$('#lb').textContent='Entrar'}
+  };
+}
+function st(id){if(!S.e[id])S.e[id]={m:{},f:{best:0,passed:false}};return S.e[id]}
+function mst(id,i){const s=st(id);if(!s.m[i])s.m[i]={best:0,quiz:false,caso:false,ativ:false,tc:'',ta:''};return s.m[i]}
+const $=s=>document.querySelector(s);
+const app=$('#app');
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]))}
+function shuffle(a){a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function eb(id){return EBOOKS.find(e=>e.id===id)}
+function modDone(id,i){const m=mst(id,i);return m.quiz&&m.caso&&m.ativ}
+function progress(e){let d=0;e.modulos.forEach((_,i)=>{if(modDone(e.id,i))d++});return {d,t:e.modulos.length}}
+function allMods(e){const p=progress(e);return p.d===p.t}
+function setTheme(e){const r=document.documentElement.style;r.setProperty('--c1',e?e.c1:'#06465a');r.setProperty('--c2',e?e.c2:'#f59a2c')}
+
+function route(){
+  const h=location.hash.replace(/^#\/?/,'').split('/');
+  window.scrollTo(0,0);
+  const o=document.getElementById('out');if(o)o.style.display=S.cpf?'':'none';
+  if(!S.cpf)return login();
+  if(!h[0]){setTheme(null);return home()}
+  const e=eb(h[1]);if(h[0]!=='e'||!e){setTheme(null);return home()}
+  setTheme(e);
+  if(h[2]==='m')return module_(e,parseInt(h[3],10));
+  if(h[2]==='final')return final_(e);
+  if(h[2]==='cert')return cert(e);
+  return ebook(e);
+}
+window.addEventListener('hashchange',route);
+
+function home(){
+  document.title='Humanora · Atividades e Certificados';
+  app.innerHTML=`<h1>Atividades e certificados</h1>
+  <p class="mut">Escolha o seu e-book, faça as atividades no seu ritmo e, ao passar de 70% na prova final, baixe na hora o seu certificado de conclusão.</p>
+  <div class="grid">`+EBOOKS.map(e=>{const p=progress(e);const pct=Math.round(p.d/p.t*100);const fin=st(e.id).f.passed;
+  return `<a class="card" href="#/e/${e.id}" style="text-decoration:none;color:inherit"><img class="capa" src="${e.capa}" alt="${esc(e.nome)}" loading="lazy"><div class="b"><div class="t">${esc(e.nome)}</div><div class="mut">${e.horas} horas · ${p.t} módulos</div><div class="bar"><i style="width:${fin?100:pct}%"></i></div><div class="row"><span class="chip ${fin?'ok':(p.d?'wip':'')}">${fin?'Concluído':(p.d?p.d+' de '+p.t+' módulos':'Não iniciado')}</span></div></div></a>`}).join('')+`</div>
+  <div class="foot">Humanora Educação em Cursos Livres Ltda. Seu progresso fica salvo neste aparelho. Certificado de conclusão de curso livre; não substitui formação técnica regulamentada.</div>`;
+}
+
+function ebook(e){
+  document.title=e.nome+' · Humanora';
+  const p=progress(e),s=st(e.id),ok=allMods(e);
+  app.innerHTML=`<div class="crumb"><a href="#/">Meus e-books</a></div>
+  <div class="hero"><img src="${e.capa}" alt=""><div><h1>${esc(e.nome)}</h1><p class="mut">Carga horária do certificado: <b>${e.horas} horas</b></p>
+  <div class="bar" style="margin:10px 0"><i style="width:${Math.round(p.d/p.t*100)}%"></i></div>
+  <p class="mut">${p.d} de ${p.t} módulos concluídos${s.f.passed?' · prova final aprovada':''}</p></div></div>
+  <h2>Como funciona</h2><div class="sum">1) Leia o capítulo no e-book. 2) Responda o questionário (mínimo 70%). 3) Faça o estudo de caso e a atividade prática. 4) Ao concluir os ${p.t} módulos, faça a prova final (mínimo 70%). 5) Baixe o seu certificado.</div>
+  <h2>Módulos</h2>`+e.modulos.map((m,i)=>{const d=modDone(e.id,i),x=mst(e.id,i);const w=x.quiz||x.caso||x.ativ;
+   return `<a class="mod" href="#/e/${e.id}/m/${i}"><span class="n">${i+1}</span><span class="tt">${esc(m.t)}</span><span class="chip ${d?'ok':(w?'wip':'')}">${d?'Concluído':(w?'Em andamento':'Começar')}</span></a>`}).join('')+`
+  <h2>Prova final e certificado</h2>
+  <div class="row"><a class="btn ${ok?'':'ghost'}" ${ok?'':'style="pointer-events:none;opacity:.5"'} href="#/e/${e.id}/final">Prova final (20 questões)</a>
+  <a class="btn alt" ${s.f.passed?'':'style="pointer-events:none;opacity:.5"'} href="#/e/${e.id}/cert">Baixar certificado</a></div>
+  ${ok?'':'<p class="mut">A prova final é liberada quando você concluir todos os módulos.</p>'}`;
+}
+
+function quizHTML(qs,name){
+  return qs.map((q,i)=>{const order=shuffle(q.o.map((t,k)=>k));
+   return `<div class="q" data-i="${i}" data-a="${q.a}"><div class="qt">${i+1}. ${esc(q.q)}</div>`+order.map(k=>`<label data-k="${k}"><input type="radio" name="${name}${i}" value="${k}"><span>${esc(q.o[k])}</span></label>`).join('')+`<div class="fb"></div></div>`}).join('');
+}
+function grade(root,qs){
+  let hit=0,blank=0;
+  root.querySelectorAll('.q').forEach(q=>{
+    const a=+q.dataset.a;const c=q.querySelector('input:checked');
+    q.classList.remove('right','wrong');q.querySelectorAll('label').forEach(l=>{l.classList.remove('sel','corr')});
+    q.querySelectorAll('input').forEach(i=>i.disabled=true);
+    if(!c){blank++;q.classList.add('wrong');q.querySelector('.fb').textContent='Sem resposta.'}
+    const k=c?+c.value:-1;if(c)c.parentElement.classList.add('sel');
+    q.querySelector('label[data-k="'+a+'"]').classList.add('corr');
+    if(k===a){hit++;q.classList.add('right');q.querySelector('.fb').textContent='Correto.';q.querySelector('.fb').style.color='var(--ok)'}
+    else if(c){q.classList.add('wrong');q.querySelector('.fb').textContent='Resposta correta marcada em verde.';q.querySelector('.fb').style.color='var(--bad)'}
+  });
+  return {hit,blank,total:qs.length};
+}
+
+function module_(e,i){
+  const m=e.modulos[i];if(!m)return ebook(e);
+  const x=mst(e.id,i);
+  document.title='Módulo '+(i+1)+' · '+e.nome;
+  app.innerHTML=`<div class="crumb"><a href="#/">Meus e-books</a> › <a href="#/e/${e.id}">${esc(e.nome)}</a></div>
+  <h1>Módulo ${i+1}</h1><p style="font-weight:700;color:var(--c1);font-size:17px">${esc(m.t)}</p>
+  <h2>1. Releia o Capítulo ${i+1} do e-book</h2><div class="sum">${m.resumo.map(r=>'• '+esc(r)).join('<br>')}</div>
+  <h2>2. Questionário</h2><p class="mut">Precisa de 70% ou mais (7 de 10) para concluir esta etapa. Você pode refazer quantas vezes quiser.</p>
+  <div id="quiz">${quizHTML(m.qs,'q')}</div>
+  <div class="row"><button class="btn" id="send">Corrigir questionário</button><button class="btn ghost hidden" id="retry">Refazer</button></div>
+  <div id="res"></div>
+  <h2>3. Estudo de caso</h2><div class="box"><p>${esc(m.caso.texto)}</p></div>
+  <p class="mut">Escreva suas respostas (ficam salvas neste aparelho). Mínimo de poucas linhas para concluir.</p>
+  ${m.caso.perguntas.map((p,k)=>`<h3>${'ABC'[k]}) ${esc(p)}</h3>`).join('')}
+  <textarea id="tc" placeholder="Escreva aqui as respostas do estudo de caso...">${esc(x.tc)}</textarea>
+  <div class="row" style="margin-top:8px"><button class="btn ghost" id="bc">${x.caso?'Estudo de caso concluído ✓':'Marcar estudo de caso como concluído'}</button></div>
+  <h2>4. Atividade prática</h2><div class="box"><p>${esc(m.ativ.texto)}</p><p class="mut">Tempo estimado: ${esc(m.ativ.tempo)}</p></div>
+  <textarea id="ta" placeholder="Anote aqui o que você fez (ou cole o seu resultado)...">${esc(x.ta)}</textarea>
+  <div class="row" style="margin-top:8px"><button class="btn ghost" id="ba">${x.ativ?'Atividade concluída ✓':'Marcar atividade como concluída'}</button></div>
+  <h2>Situação do módulo</h2><div id="sit"></div>
+  <div class="row" style="margin-top:14px">${i>0?`<a class="btn ghost" href="#/e/${e.id}/m/${i-1}">← Módulo anterior</a>`:''}${i<e.modulos.length-1?`<a class="btn" href="#/e/${e.id}/m/${i+1}">Próximo módulo →</a>`:`<a class="btn" href="#/e/${e.id}">Voltar ao e-book</a>`}</div>`;
+  const sit=()=>{const m=mst(e.id,i);$('#sit').innerHTML=`<span class="chip ${m.quiz?'ok':''}">Questionário ${m.quiz?'✓ ('+Math.round(m.best*100)+'%)':'pendente'}</span> <span class="chip ${m.caso?'ok':''}">Estudo de caso ${m.caso?'✓':'pendente'}</span> <span class="chip ${m.ativ?'ok':''}">Atividade ${m.ativ?'✓':'pendente'}</span> ${modDone(e.id,i)?'<span class="chip ok">Módulo concluído</span>':''}`};
+  sit();
+  $('#send').onclick=()=>{
+    const r=grade($('#quiz'),m.qs);const pct=r.hit/r.total;const mm=mst(e.id,i);
+    if(pct>mm.best)mm.best=pct;if(pct>=PASS)mm.quiz=true;save();
+    $('#res').innerHTML=`<div class="result ${pct>=PASS?'pass':'fail'}"><div class="score">${r.hit}/${r.total}</div><p><b>${pct>=PASS?'Muito bem! Etapa concluída.':'Ainda não atingiu 70%. Releia o capítulo e tente de novo.'}</b></p></div>`;
+    $('#send').classList.add('hidden');$('#retry').classList.remove('hidden');sit();
+    $('#res').scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  $('#retry').onclick=()=>{$('#quiz').innerHTML=quizHTML(m.qs,'q');$('#res').innerHTML='';$('#send').classList.remove('hidden');$('#retry').classList.add('hidden');$('#quiz').scrollIntoView()};
+  $('#bc').onclick=()=>{const t=$('#tc').value.trim();const mm=mst(e.id,i);mm.tc=t;if(t.length<60){alert('Escreva um pouco mais nas respostas do estudo de caso (pelo menos algumas linhas).');return}mm.caso=true;save();$('#bc').textContent='Estudo de caso concluído ✓';sit()};
+  $('#ba').onclick=()=>{const t=$('#ta').value.trim();const mm=mst(e.id,i);mm.ta=t;if(t.length<40){alert('Descreva brevemente o que você fez na atividade (pelo menos algumas linhas).');return}mm.ativ=true;save();$('#ba').textContent='Atividade concluída ✓';sit()};
+  ['tc','ta'].forEach(id=>$('#'+id).addEventListener('input',()=>{const mm=mst(e.id,i);mm[id]=$('#'+id).value;save()}));
+}
+
+function final_(e){
+  if(!allMods(e)){location.hash='#/e/'+e.id;return}
+  document.title='Prova final · '+e.nome;
+  app.innerHTML=`<div class="crumb"><a href="#/">Meus e-books</a> › <a href="#/e/${e.id}">${esc(e.nome)}</a></div>
+  <h1>Prova final</h1><p class="mut">20 questões · aproveitamento mínimo: 70% (14 acertos). Você pode refazer.</p>
+  <div id="quiz">${quizHTML(e.final,'f')}</div>
+  <div class="row"><button class="btn" id="send">Corrigir prova</button><button class="btn ghost hidden" id="retry">Refazer prova</button></div><div id="res"></div>`;
+  $('#send').onclick=()=>{
+    const r=grade($('#quiz'),e.final);const pct=r.hit/r.total;const s=st(e.id);
+    if(pct>s.f.best)s.f.best=pct;if(pct>=PASS)s.f.passed=true;save();
+    $('#res').innerHTML=`<div class="result ${pct>=PASS?'pass':'fail'}"><div class="score">${r.hit}/${r.total} (${Math.round(pct*100)}%)</div><p><b>${pct>=PASS?'Parabéns, você foi aprovado(a)!':'Ainda não atingiu 70%. Revise os módulos e tente novamente.'}</b></p>${pct>=PASS?`<a class="btn alt" href="#/e/${e.id}/cert">Baixar meu certificado</a>`:''}</div>`;
+    $('#send').classList.add('hidden');$('#retry').classList.remove('hidden');$('#res').scrollIntoView({behavior:'smooth',block:'center'});
+  };
+  $('#retry').onclick=()=>{$('#quiz').innerHTML=quizHTML(e.final,'f');$('#res').innerHTML='';$('#send').classList.remove('hidden');$('#retry').classList.add('hidden');window.scrollTo(0,0)};
+}
+
+function hash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,16777619)}return (h>>>0).toString(36).toUpperCase().padStart(7,'0')}
+function codeFor(e){return 'HM-'+e.id.slice(0,3).toUpperCase()+'-'+hash(S.cpf+'|'+e.id)}
+function certInfo(e){const s=st(e.id);if(!s.f.certDate)s.f.certDate=new Date().toISOString().slice(0,10);return {nome:S.nome,nota:Math.round(s.f.best*100),data:new Date(s.f.certDate+'T12:00:00'),code:codeFor(e)}}
+function maskedCpf(){const c=S.cpf||'00000000000';return '***.'+c.slice(3,6)+'.'+c.slice(6,9)+'-**'}
+function cert(e){
+  const s=st(e.id);if(!s.f.passed){location.hash='#/e/'+e.id;return}
+  document.title='Certificado · '+e.nome;
+  const info=certInfo(e);save();
+  app.innerHTML=`<div class="crumb"><a href="#/">Meus e-books</a> › <a href="#/e/${e.id}">${esc(e.nome)}</a></div>
+  <h1>Seu certificado</h1><p class="mut">Emitido para <b>${esc(info.nome)}</b>. Ele tem frente e verso (histórico escolar com o conteúdo programático).</p>
+  <h3>Frente</h3><canvas id="cv" width="2000" height="1414"></canvas>
+  <h3>Verso · histórico escolar</h3><canvas id="cv2" width="2000" height="1414"></canvas>
+  <div class="row"><button class="btn alt" id="pdf">Baixar PDF (frente e verso)</button><button class="btn ghost" id="png1">Imagem da frente</button><button class="btn ghost" id="png2">Imagem do verso</button></div>
+  <p class="mut">Código de verificação: <b>${info.code}</b>. A Humanora consegue conferir a autenticidade pelo seu CPF e nome.</p>`;
+  const draw=()=>{drawCert($('#cv'),e,info);drawVerso($('#cv2'),e,info)};
+  document.fonts.ready.then(draw);draw();
+  const log=()=>{if(API_URL&&!s.f.logged){api({action:'cert',cpf:S.cpf,nome:S.nome,id:e.id,ebook:e.nome,horas:e.horas,nota:info.nota,code:info.code,data:info.data.toISOString().slice(0,10)}).then(r=>{if(r.ok){s.f.logged=true;save()}}).catch(()=>{})}};
+  log();
+  $('#png1').onclick=()=>{draw();const a=document.createElement('a');a.href=$('#cv').toDataURL('image/png');a.download='Certificado-frente-'+e.id+'.png';a.click()};
+  $('#png2').onclick=()=>{draw();const a=document.createElement('a');a.href=$('#cv2').toDataURL('image/png');a.download='Certificado-verso-'+e.id+'.png';a.click()};
+  $('#pdf').onclick=()=>{draw();const {jsPDF}=window.jspdf;const pdf=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});pdf.addImage($('#cv').toDataURL('image/jpeg',.95),'JPEG',0,0,297,210);pdf.addPage();pdf.addImage($('#cv2').toDataURL('image/jpeg',.95),'JPEG',0,0,297,210);pdf.save('Certificado-Humanora-'+e.id+'.pdf')};
+}
+function frame(c,e,W,H){
+  c.fillStyle='#fdfaf3';c.fillRect(0,0,W,H);
+  c.save();c.globalAlpha=.05;c.fillStyle=e.c1;c.font='800 300px Poppins';c.textAlign='center';c.translate(W/2,H/2+90);c.rotate(-0.25);c.fillText('HUMANORA',0,0);c.restore();
+  c.strokeStyle=e.c1;c.lineWidth=18;c.strokeRect(46,46,W-92,H-92);
+  c.strokeStyle=e.c2;c.lineWidth=4;c.strokeRect(78,78,W-156,H-156);
+  c.strokeStyle=e.c1;c.lineWidth=2;c.strokeRect(96,96,W-192,H-192);
+  [[96,96],[W-96,96],[96,H-96],[W-96,H-96]].forEach(([x,y])=>{c.fillStyle=e.c2;c.beginPath();c.arc(x,y,16,0,7);c.fill();c.fillStyle='#fdfaf3';c.beginPath();c.arc(x,y,7,0,7);c.fill()});
+}
+function fmtData(d){const t=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});return t.charAt(0).toUpperCase()+t.slice(1)}
+function drawCert(cv,e,info){
+  const c=cv.getContext('2d'),W=cv.width,H=cv.height,nome=info.nome;
+  frame(c,e,W,H);
+  if(window.__logo&&window.__logo.complete){const lw=420,lh=lw*window.__logo.height/window.__logo.width;c.drawImage(window.__logo,W/2-lw/2,140,lw,lh)}
+  c.textAlign='center';c.fillStyle=e.c1;
+  c.font='800 104px Poppins';c.fillText('CERTIFICADO',W/2,420);
+  c.font='600 40px Poppins';c.fillStyle=e.c2;c.fillText('DE CONCLUSÃO',W/2,480);
+  c.fillStyle='#3b4358';c.font='500 36px Poppins';c.fillText('Certificamos que',W/2,590);
+  c.fillStyle=e.c1;let fs=112;c.font='italic 600 '+fs+'px "Playfair Display",serif';
+  while(c.measureText(nome).width>W-420&&fs>50){fs-=4;c.font='italic 600 '+fs+'px "Playfair Display",serif'}
+  c.fillText(nome,W/2,740);
+  c.strokeStyle=e.c2;c.lineWidth=3;c.beginPath();c.moveTo(W/2-520,775);c.lineTo(W/2+520,775);c.stroke();
+  c.fillStyle='#262c3d';c.font='500 38px Poppins';
+  const lines=['concluiu com aproveitamento o curso livre','“'+e.nome+'”,','com carga horária de '+e.horas+' horas, cumprindo os módulos de estudo,','as atividades práticas e a prova final com nota de '+info.nota+'%.'];
+  lines.forEach((t,i)=>c.fillText(t,W/2,860+i*56));
+  c.font='500 30px Poppins';c.fillStyle='#4a5266';c.fillText(fmtData(info.data),W/2,1120);
+  c.save();c.translate(W-330,1130);c.fillStyle=e.c2;c.beginPath();for(let i=0;i<24;i++){const a=i*Math.PI/12,r=i%2?100:116;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();
+  c.fillStyle=e.c1;c.beginPath();c.arc(0,0,84,0,7);c.fill();c.fillStyle='#fff';c.textAlign='center';c.font='800 48px Poppins';c.fillText(e.horas+'h',0,8);c.font='600 17px Poppins';c.fillText('CARGA HORÁRIA',0,36);c.restore();
+  c.strokeStyle=e.c1;c.lineWidth=2;c.beginPath();c.moveTo(W/2-230,1250);c.lineTo(W/2+230,1250);c.stroke();
+  c.fillStyle=e.c1;c.textAlign='center';c.font='700 26px Poppins';c.fillText('Humanora Educação em Cursos Livres Ltda',W/2,1290);
+  c.fillStyle='#6a7284';c.font='500 20px Poppins';c.fillText('Código de verificação: '+info.code+'  ·  Certificado de curso livre. Não substitui formação técnica regulamentada.',W/2,1328);
+}
+function ell(c,t,w){if(c.measureText(t).width<=w)return t;while(t.length>3&&c.measureText(t+'…').width>w)t=t.slice(0,-1);return t.trim()+'…'}
+function fmtMin(m){const h=Math.floor(m/60),r=m%60;return h?(h+'h'+(r?String(r).padStart(2,'0'):'')):(r+' min')}
+function drawVerso(cv,e,info){
+  const c=cv.getContext('2d'),W=cv.width,H=cv.height;
+  frame(c,e,W,H);
+  c.textAlign='center';c.fillStyle=e.c1;c.font='800 62px Poppins';c.fillText('HISTÓRICO ESCOLAR',W/2,200);
+  c.fillStyle=e.c2;c.font='600 30px Poppins';c.fillText('CONTEÚDO PROGRAMÁTICO',W/2,244);
+  c.textAlign='left';c.fillStyle='#262c3d';c.font='600 25px Poppins';
+  c.fillText('Aluno(a): '+info.nome,170,296);c.textAlign='right';c.fillText('CPF: '+maskedCpf(),W-170,296);
+  c.textAlign='left';c.font='500 23px Poppins';c.fillStyle='#4a5266';c.fillText('Curso livre: '+e.nome+'  ·  Carga horária total: '+e.horas+' horas  ·  Conclusão: '+fmtData(info.data)+'  ·  Aproveitamento final: '+info.nota+'%',170,336);
+  const X0=170,X1=W-170,xN=X0,xT=X0+70,xH=X1-330,xA=X1-140;
+  const n=e.modulos.length;const top=370,bottom=1262;const rh=Math.min(70,Math.floor((bottom-top-56)/(n+2)));
+  c.fillStyle=e.c1;c.fillRect(X0,top,X1-X0,48);c.fillStyle='#fff';c.font='700 21px Poppins';c.textAlign='left';
+  c.fillText('Nº',xN+14,top+32);c.fillText('MÓDULO E CONTEÚDO PROGRAMÁTICO',xT,top+32);c.textAlign='center';c.fillText('C.H.',xH+80,top+32);c.fillText('APROVEIT.',xA+60,top+32);
+  let y=top+48;const tw=xH-xT-20;
+  const rows=e.modulos.map((m,i)=>({n:String(i+1),t:m.t,em:m.resumo.join(' · '),min:m.min||55,ap:Math.round(mst(e.id,i).best*100)+'%'}));
+  rows.push({n:'★',t:'Prova final',em:'Avaliação com 20 questões de todo o conteúdo do curso.',min:e.minFinal||60,ap:info.nota+'%'});
+  let tot=0;
+  rows.forEach((r,i)=>{
+    c.fillStyle=i%2?'#f4efe2':'#fbf7ec';c.fillRect(X0,y,X1-X0,rh);tot+=r.min;
+    c.fillStyle=e.c2;c.font='800 24px Poppins';c.textAlign='left';c.fillText(r.n,xN+14,y+rh/2+9);
+    c.fillStyle='#1d2433';c.font='700 '+(rh>=54?22:21)+'px Poppins';c.fillText(ell(c,r.t,tw),xT,y+(rh>=54?26:rh/2+8));
+    if(rh>=54){c.fillStyle='#5b6475';c.font='500 17px Poppins';c.fillText(ell(c,r.em,tw),xT,y+46)}
+    c.fillStyle='#1d2433';c.font='600 22px Poppins';c.textAlign='center';c.fillText(fmtMin(r.min),xH+80,y+rh/2+8);c.fillStyle=e.c1;c.fillText(r.ap,xA+60,y+rh/2+8);
+    y+=rh;
+  });
+  c.fillStyle=e.c1;c.fillRect(X0,y,X1-X0,50);c.fillStyle='#fff';c.font='700 22px Poppins';c.textAlign='left';c.fillText('CARGA HORÁRIA CERTIFICADA',xT,y+33);c.textAlign='center';c.fillText(e.horas+'h',xH+80,y+33);
+  c.fillStyle='#6a7284';c.font='500 19px Poppins';c.textAlign='center';
+  c.fillText('Humanora Educação em Cursos Livres Ltda  ·  Código de verificação: '+info.code+'  ·  Certificado de curso livre, não substitui formação técnica regulamentada.',W/2,1318);
+}
+window.__logo=new Image();window.__logo.onload=()=>{if(location.hash.includes('/cert'))route()};window.__logo.src='logo.png';
+route();
+</script>
+</body>
+</html>
