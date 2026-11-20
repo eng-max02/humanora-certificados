@@ -288,7 +288,7 @@ function drawCert(cv,e,info){
   c.save();c.translate(W-300,1100);c.fillStyle=e.c2;c.beginPath();for(let i=0;i<24;i++){const a=i*Math.PI/12,r=i%2?100:116;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();
   c.fillStyle=e.c1;c.beginPath();c.arc(0,0,84,0,7);c.fill();c.fillStyle='#fff';c.textAlign='center';c.font='800 48px Poppins';c.fillText(e.horas+'h',0,8);c.font='600 17px Poppins';c.fillText('CARGA HORÁRIA',0,36);c.restore();
   // assinaturas das duas diretoras (imagens opcionais: assinatura-kelen.png / assinatura-mariana.png)
-  [[W/2-300,'Kelen Patricia Rodrigues Ferreira',window.__sig1],[W/2+300,'Mariana Marcelino de Oliveira',window.__sig2]].forEach(([x,nm,img])=>{
+  [[W/2-300,'Kelen Ferreira',window.__sig1],[W/2+300,'Mariana Oliveira',window.__sig2]].forEach(([x,nm,img])=>{
     if(img&&img.complete&&img.naturalWidth>0){const mh=84,mw=380;let r=Math.min(mw/img.naturalWidth,mh/img.naturalHeight);const iw=img.naturalWidth*r,ih=img.naturalHeight*r;c.drawImage(img,x-iw/2,1192-ih,iw,ih)}
     c.strokeStyle=e.c1;c.lineWidth=2;c.beginPath();c.moveTo(x-215,1196);c.lineTo(x+215,1196);c.stroke();
     c.fillStyle=e.c1;c.textAlign='center';c.font='700 25px Poppins';c.fillText(nm,x,1234);
