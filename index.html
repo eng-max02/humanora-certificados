@@ -7,7 +7,7 @@
 <meta name="description" content="Faça as atividades dos seus e-books Humanora e receba seu certificado de conclusão.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Playfair+Display:ital,wght@1,600&family=Mrs+Saint+Delafield&family=Herr+Von+Muellerhoff&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{--bg:#f6f4ee;--card:#fff;--ink:#1d2433;--mut:#5b6475;--line:#e5e2d8;--c1:#06465a;--c2:#f59a2c;--ok:#1f9d5b;--bad:#d64545}
@@ -253,7 +253,7 @@ function cert(e){
   <div class="row"><button class="btn alt" id="pdf">Baixar PDF (frente e verso)</button><button class="btn ghost" id="png1">Imagem da frente</button><button class="btn ghost" id="png2">Imagem do verso</button></div>
   <p class="mut">Código de verificação: <b>${info.code}</b>. A Humanora consegue conferir a autenticidade pelo seu CPF e nome.</p>`;
   const draw=()=>{drawCert($('#cv'),e,info);drawVerso($('#cv2'),e,info)};
-  document.fonts.ready.then(draw);draw();
+  Promise.all(['110px "Mrs Saint Delafield"','110px "Herr Von Muellerhoff"','italic 600 40px "Playfair Display"'].map(f=>document.fonts.load(f))).then(draw).catch(draw);draw();
   const log=()=>{if(API_URL&&!s.f.logged){api({action:'cert',cpf:S.cpf,nome:S.nome,id:e.id,ebook:e.nome,horas:e.horas,nota:info.nota,code:info.code,data:info.data.toISOString().slice(0,10)}).then(r=>{if(r.ok){s.f.logged=true;save()}}).catch(()=>{})}};
   log();
   $('#png1').onclick=()=>{draw();const a=document.createElement('a');a.href=$('#cv').toDataURL('image/png');a.download='Certificado-frente-'+e.id+'.png';a.click()};
@@ -269,6 +269,15 @@ function frame(c,e,W,H){
   [[96,96],[W-96,96],[96,H-96],[W-96,H-96]].forEach(([x,y])=>{c.fillStyle=e.c2;c.beginPath();c.arc(x,y,16,0,7);c.fill();c.fillStyle='#fdfaf3';c.beginPath();c.arc(x,y,7,0,7);c.fill()});
 }
 function fmtData(d){const t=d.toLocaleDateString('pt-BR',{day:'2-digit',month:'long',year:'numeric'});return t.charAt(0).toUpperCase()+t.slice(1)}
+function drawSig(c,x,y,txt,font,cor){
+  c.save();c.translate(x,y);c.rotate(-0.045);c.fillStyle='#14234b';c.textAlign='center';
+  const px=font.indexOf('Delafield')>0?118:112;c.font=px+'px "'+font+'"';c.fillText(txt,0,0);
+  const w=c.measureText(txt).width;
+  c.strokeStyle='#14234b';c.lineWidth=3.2;c.lineCap='round';c.beginPath();
+  c.moveTo(-w*0.5,10);c.bezierCurveTo(-w*0.2,24,w*0.2,-2,w*0.55,12);c.stroke();
+  c.lineWidth=1.8;c.beginPath();c.moveTo(-w*0.1,20);c.bezierCurveTo(w*0.1,27,w*0.3,19,w*0.4,23);c.stroke();
+  c.restore();
+}
 function drawCert(cv,e,info){
   const c=cv.getContext('2d'),W=cv.width,H=cv.height,nome=info.nome;
   frame(c,e,W,H);
@@ -288,7 +297,8 @@ function drawCert(cv,e,info){
   c.save();c.translate(W-300,1100);c.fillStyle=e.c2;c.beginPath();for(let i=0;i<24;i++){const a=i*Math.PI/12,r=i%2?100:116;c.lineTo(Math.cos(a)*r,Math.sin(a)*r)}c.closePath();c.fill();
   c.fillStyle=e.c1;c.beginPath();c.arc(0,0,84,0,7);c.fill();c.fillStyle='#fff';c.textAlign='center';c.font='800 48px Poppins';c.fillText(e.horas+'h',0,8);c.font='600 17px Poppins';c.fillText('CARGA HORÁRIA',0,36);c.restore();
   // assinaturas das duas diretoras (imagens opcionais: assinatura-kelen.png / assinatura-mariana.png)
-  [[W/2-300,'Kellen Rodrigues','Diretora Pedagógica',window.__sig1],[W/2+300,'Mariana Marcelino','Diretora Administrativa',window.__sig2]].forEach(([x,nm,cargo,img])=>{
+  [[W/2-300,'Kelen Rodrigues','Diretora Pedagógica',window.__sig1],[W/2+300,'Mariana Marcelino','Diretora Administrativa',window.__sig2]].forEach(([x,nm,cargo,img])=>{
+    if(!(img&&img.complete&&img.naturalWidth>0)){drawSig(c,x,1172,nm.split(' ')[0],x<W/2?'Mrs Saint Delafield':'Herr Von Muellerhoff',e.c1)}
     if(img&&img.complete&&img.naturalWidth>0){const mh=84,mw=380;let r=Math.min(mw/img.naturalWidth,mh/img.naturalHeight);const iw=img.naturalWidth*r,ih=img.naturalHeight*r;c.drawImage(img,x-iw/2,1192-ih,iw,ih)}
     c.strokeStyle=e.c1;c.lineWidth=2;c.beginPath();c.moveTo(x-215,1196);c.lineTo(x+215,1196);c.stroke();
     c.fillStyle=e.c1;c.textAlign='center';c.font='700 25px Poppins';c.fillText(nm,x,1234);
