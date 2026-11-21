@@ -72,11 +72,13 @@ canvas#cv{width:100%;max-width:720px;border:1px solid var(--line);border-radius:
 <header class="top"><div class="in">
 <a href="#/"><img src="logo.png" alt="Humanora"></a><span class="sp"></span><span id="sync" style="font-size:11px;color:#1f9d5b"></span><a class="home" href="#/">Meus e-books</a><a class="home" href="#" id="out" style="color:#8a93a6;font-weight:500" onclick="logout();return false">Sair</a>
 </div></header>
+<div id="bn"></div>
 <main id="app"></main>
 <script src="data.js"></script>
 <script src="config.js"></script>
 <script>
-const KEY='humanora_certificados_v2';
+let PREVIEW=false;try{PREVIEW=sessionStorage.getItem('hm_prev')==='1'}catch(e){}
+const KEY=PREVIEW?'humanora_preview':'humanora_certificados_v2';
 const PASS=0.7;
 let S=load();
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY));return s&&s.e?s:{nome:'',cpf:'',e:{}}}catch(e){return {nome:'',cpf:'',e:{}}}}
@@ -85,7 +87,8 @@ function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}schedS
 function setSync(t,ok){const el=document.getElementById('sync');if(el){el.textContent=t;el.style.color=ok?'#1f9d5b':'#8a5a00'}}
 function schedSync(){if(!API_URL||!S.cpf)return;clearTimeout(syncT);setSync('salvando…',false);syncT=setTimeout(pushState,1200)}
 function slim(){const o=JSON.parse(JSON.stringify(S.e));Object.values(o).forEach(e=>Object.values(e.m||{}).forEach(m=>{m.tc=(m.tc||'').slice(0,700);m.ta=(m.ta||'').slice(0,700)}));return o}
-async function api(body){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});return r.json()}
+async function api(body){if(PREVIEW)return {ok:true};return apiReal(body)}
+async function apiReal(body){const r=await fetch(API_URL,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)});return r.json()}
 async function pushState(){try{const r=await api({action:'save',cpf:S.cpf,nome:S.nome,state:slim()});setSync(r.ok?'salvo ✓':'erro ao salvar',!!r.ok)}catch(e){setSync('sem conexão (salvo neste aparelho)',false)}}
 function normN(s){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/\s+/g,' ').trim()}
 function cpfOk(c){c=(c||'').replace(/\D/g,'');if(c.length!==11||/^(\d)\1+$/.test(c))return false;for(let t=9;t<11;t++){let s=0;for(let i=0;i<t;i++)s+=(+c[i])*(t+1-i);const d=(s*10)%11%10;if(d!==+c[t])return false}return true}
@@ -131,6 +134,9 @@ function route(){
   const h=location.hash.replace(/^#\/?/,'').split('/');
   window.scrollTo(0,0);
   const o=document.getElementById('out');if(o)o.style.display=S.cpf?'':'none';
+  banner(h);
+  if(h[0]==='admin')return admin(h[1]);
+  if(PREVIEW&&!S.cpf){S={nome:'Aluna de Teste',cpf:'11144477735',e:S.e||{}}}
   if(!S.cpf)return login();
   if(!h[0]){setTheme(null);return home()}
   const e=eb(h[1]);if(h[0]!=='e'||!e){setTheme(null);return home()}
@@ -242,6 +248,52 @@ function hash(str){let h=2166136261;for(let i=0;i<str.length;i++){h^=str.charCod
 function codeFor(e){return 'HM-'+e.id.slice(0,3).toUpperCase()+'-'+hash(S.cpf+'|'+e.id)}
 function certInfo(e){const s=st(e.id);if(!s.f.certDate)s.f.certDate=new Date().toISOString().slice(0,10);return {nome:S.nome,nota:Math.round(s.f.best*100),data:new Date(s.f.certDate+'T12:00:00'),code:codeFor(e)}}
 function maskedCpf(){const c=S.cpf||'00000000000';return '***.'+c.slice(3,6)+'.'+c.slice(6,9)+'-**'}
+
+function marcarCertas(){document.querySelectorAll('#quiz .q').forEach(q=>{const i=q.querySelector('label[data-k="'+q.dataset.a+'"] input');if(i)i.click()})}
+function concluirTudo(id){const e=eb(id);e.modulos.forEach((_,i)=>{const m=mst(id,i);m.quiz=m.caso=m.ativ=true;m.best=1;m.tc=m.tc||'teste';m.ta=m.ta||'teste'});save();route()}
+function sairTeste(){try{sessionStorage.setItem('hm_prev','0');localStorage.removeItem('humanora_preview')}catch(e){}location.hash='#/admin';location.reload()}
+function banner(h){
+  const b=document.getElementById('bn');if(!b)return;
+  if(!PREVIEW){b.innerHTML='';return}
+  const id=h[1];let extra='<button class="btn" style="padding:6px 12px;font-size:12px" onclick="marcarCertas()">Marcar respostas certas</button>';
+  if(h[0]==='e'&&id&&eb(id))extra+=' <button class="btn" style="padding:6px 12px;font-size:12px" onclick="concluirTudo(\''+id+'\')">Concluir todos os módulos</button>';
+  b.innerHTML='<div style="background:#b3261e;color:#fff;padding:8px 16px;font-size:13px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;justify-content:center"><b>MODO TESTE (administradora): nada é salvo e nenhum certificado real é registrado.</b> '+extra+' <button class="btn ghost" style="padding:6px 12px;font-size:12px" onclick="sairTeste()">Sair do modo teste</button></div>';
+}
+function adminLogin(msg){
+  app.innerHTML='<h1>Administração</h1><p class="mut">Área das diretoras. Digite a senha de administradora.</p><div class="box"><input type="password" id="ak" placeholder="Senha de administradora" autocomplete="current-password" style="width:100%;font:15px Poppins;padding:12px;border:1.5px solid var(--line);border-radius:12px"><div class="row" style="margin-top:12px"><button class="btn" id="ab">Entrar</button></div><p class="mut" id="am" style="color:var(--bad)">'+(msg||'')+'</p></div>';
+  const go=async()=>{const k=$('#ak').value;if(!k)return;$('#ab').disabled=true;
+    try{const r=await apiReal({action:'admin_list',key:k});if(r&&r.ok){sessionStorage.setItem('hm_adm',k);route()}else{$('#am').textContent=(r&&r.err==='auth')?'Senha incorreta ou ainda não definida.':'Não foi possível entrar. Tente de novo.';$('#ab').disabled=false}}
+    catch(x){$('#am').textContent='Sem conexão com a internet.';$('#ab').disabled=false}};
+  $('#ab').onclick=go;$('#ak').addEventListener('keydown',ev=>{if(ev.key==='Enter')go()});
+}
+function cpfMask(c){c=String(c||'').replace(/\D/g,'').padStart(11,'0');return '***.'+c.slice(3,6)+'.'+c.slice(6,9)+'-**'}
+async function admin(){
+  setTheme(null);document.title='Administração · Humanora';
+  PREVIEW=false;{const bn=document.getElementById('bn');if(bn)bn.innerHTML=''}
+  const key=sessionStorage.getItem('hm_adm')||'';
+  if(!key)return adminLogin();
+  app.innerHTML=`<h1>Administração</h1><p class="mut">Área das diretoras. Nada daqui aparece para as alunas.</p>
+  <div class="row"><button class="btn ghost" id="ad-out">Sair da administração</button></div>
+  <h2>1. Testar como aluna</h2><p class="mut">Abre o site em modo teste: nada é salvo na planilha e nenhum certificado real é registrado. No modo teste há atalhos para marcar as respostas certas e concluir os módulos.</p>
+  <div class="row">${EBOOKS.map(e=>`<button class="btn" data-t="${e.id}">${esc(e.nome)}</button>`).join('')}</div>
+  <h2>2. Revisar o conteúdo</h2><select id="ad-sel" style="font:15px Poppins;padding:10px;border-radius:10px;border:1.5px solid var(--line)">${EBOOKS.map(e=>`<option value="${e.id}">${esc(e.nome)}</option>`).join('')}</select><div id="ad-cont"></div>
+  <h2>3. Alunas</h2><input type="text" id="ad-q" placeholder="Buscar por nome ou CPF" style="width:100%;font:15px Poppins;padding:12px;border:1.5px solid var(--line);border-radius:12px"><div id="ad-list" class="mut" style="margin-top:10px">Carregando…</div><div id="ad-det"></div>`;
+  $('#ad-out').onclick=()=>{sessionStorage.removeItem('hm_adm');location.hash='#/';route()};
+  document.querySelectorAll('[data-t]').forEach(b=>b.onclick=()=>{try{sessionStorage.setItem('hm_prev','1');localStorage.removeItem('humanora_preview')}catch(x){}location.hash='#/e/'+b.dataset.t;location.reload()});
+  const cont=()=>{const e=eb($('#ad-sel').value);
+    const qh=(q,i)=>`<p style="margin:8px 0 2px"><b>${i+1}. ${esc(q.q)}</b></p>`+q.o.map((o,k)=>`<div style="margin-left:14px;font-size:14px;${k===q.a?'color:#146b3c;font-weight:700':''}">${k===q.a?'✓':'•'} ${esc(o)}</div>`).join('');
+    $('#ad-cont').innerHTML=e.modulos.map((m,i)=>`<details class="box" style="margin:8px 0"><summary><b>Módulo ${i+1}: ${esc(m.t)}</b></summary><p class="mut">${m.resumo.map(esc).join(' · ')}</p>${m.qs.map(qh).join('')}<p style="margin-top:12px"><b>Estudo de caso:</b> ${esc(m.caso.texto)}</p><p><b>Atividade (${esc(m.ativ.tempo)}):</b> ${esc(m.ativ.texto)}</p></details>`).join('')+`<details class="box" style="margin:8px 0"><summary><b>Prova final (${e.final.length} questões)</b></summary>${e.final.map(qh).join('')}</details>`;};
+  $('#ad-sel').onchange=cont;cont();
+  let rows=[];
+  const draw=()=>{const q=$('#ad-q').value.toLowerCase().replace(/\D/g,'')||$('#ad-q').value.toLowerCase().trim();const t=$('#ad-q').value.toLowerCase().trim();
+    const f=rows.filter(r=>!t||String(r.nome).toLowerCase().includes(t)||String(r.cpf).includes(t.replace(/\D/g,'')||'§'));
+    $('#ad-list').innerHTML=f.length?`<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:13.5px;color:var(--ink)"><tr style="text-align:left;border-bottom:2px solid var(--line)"><th>Nome</th><th>CPF</th><th>Última atividade</th><th>Módulos</th><th></th></tr>`+f.map(r=>`<tr style="border-bottom:1px solid var(--line)"><td>${esc(r.nome)}</td><td>${cpfMask(r.cpf)}</td><td>${esc(String(r.ult).slice(0,16).replace('T',' '))}</td><td>${r.mods}</td><td><button class="btn ghost" style="padding:4px 10px;font-size:12px" data-c="${esc(r.cpf)}">Ver</button></td></tr>`).join('')+`</table></div>`:'Nenhuma aluna encontrada.';
+    document.querySelectorAll('[data-c]').forEach(b=>b.onclick=async()=>{const r=await apiReal({action:'admin_get',key,cpf:b.dataset.c});if(!r||!r.ok){$('#ad-det').innerHTML='<p class="mut">Não foi possível abrir.</p>';return}
+      const st0=r.state||{};$('#ad-det').innerHTML=`<div class="box" style="margin-top:12px"><b>${esc(r.nome)}</b> · ${cpfMask(b.dataset.c)}`+EBOOKS.map(e=>{const s=st0[e.id];if(!s)return '';const d=Object.values(s.m||{}).filter(m=>m.quiz&&m.caso&&m.ativ).length;return `<p style="margin:6px 0">${esc(e.nome)}: ${d} de ${e.modulos.length} módulos${s.f&&s.f.passed?' · prova final aprovada ('+Math.round((s.f.best||0)*100)+'%)':''}</p>`}).join('')+'</div>';$('#ad-det').scrollIntoView({behavior:'smooth'})})};
+  $('#ad-q').addEventListener('input',draw);
+  try{const r=await apiReal({action:'admin_list',key});if(r&&r.ok){rows=r.rows;draw()}else{sessionStorage.removeItem('hm_adm');adminLogin('Sessão expirada. Entre de novo.')}}catch(x){$('#ad-list').textContent='Sem conexão com a internet.'}
+}
+
 function cert(e){
   const s=st(e.id);if(!s.f.passed){location.hash='#/e/'+e.id;return}
   document.title='Certificado · '+e.nome;
